@@ -18,12 +18,17 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   const [theme,  setTheme]  = useState<Theme>("dark");
   const [locale, setLocale] = useState<Locale>("ru");
 
-  /* читаем сохранённые настройки */
+  /* читаем сохранённые настройки; при первом визите определяем язык по браузеру */
   useEffect(() => {
     const savedTheme  = localStorage.getItem("theme")  as Theme  | null;
     const savedLocale = localStorage.getItem("locale") as Locale | null;
     if (savedTheme)  setTheme(savedTheme);
-    if (savedLocale) setLocale(savedLocale);
+    if (savedLocale) {
+      setLocale(savedLocale);
+    } else {
+      const detected: Locale = navigator.language.toLowerCase().startsWith("ru") ? "ru" : "en";
+      setLocale(detected);
+    }
   }, []);
 
   /* применяем тему к <html> */
