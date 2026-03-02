@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { flushSync } from "react-dom";
 import { useSite, useT } from "@/context/SiteContext";
 import config from "@/portfolio.config";
 
@@ -66,6 +67,31 @@ export default function Navbar() {
 
   const closeMenu = () => setMenuOpen(false);
 
+  const handleThemeToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const x = e.clientX;
+    const y = e.clientY;
+    const r = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y),
+    );
+
+    if (!document.startViewTransition) {
+      toggleTheme();
+      return;
+    }
+
+    const transition = document.startViewTransition(() => {
+      flushSync(toggleTheme);
+    });
+
+    transition.ready.then(() => {
+      document.documentElement.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
+        { duration: 380, easing: "ease-out", pseudoElement: "::view-transition-new(root)" },
+      );
+    }).catch(() => {});
+  };
+
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       scrolled || menuOpen
@@ -111,7 +137,7 @@ export default function Navbar() {
             className="hidden md:flex items-center justify-center w-8 h-8 rounded-md text-xs font-mono font-bold border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
             {locale === "ru" ? "EN" : "RU"}
           </button>
-          <button onClick={toggleTheme}
+          <button onClick={handleThemeToggle}
             className="hidden md:flex items-center justify-center w-8 h-8 rounded-md border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
             {theme === "dark" ? <SunIcon /> : <MoonIcon />}
           </button>
@@ -151,7 +177,7 @@ export default function Navbar() {
               className="px-3 py-1.5 rounded-md text-xs font-mono font-bold border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
               {locale === "ru" ? "EN" : "RU"}
             </button>
-            <button onClick={toggleTheme}
+            <button onClick={handleThemeToggle}
               className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
               {theme === "dark" ? <><SunIcon /><span>{t(ui.themeLight)}</span></> : <><MoonIcon /><span>{t(ui.themeDark)}</span></>}
             </button>
