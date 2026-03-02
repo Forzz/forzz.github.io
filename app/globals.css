@@ -5,10 +5,12 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   overflow-x: hidden;
+  max-width: 100%;
 }
 
 /* ── Hero: floating blobs ──────────────────────────────── */
@@ -40,6 +42,12 @@ body {
 
 /* ── Reduced motion ─────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   .hero-blob-1, .hero-blob-2, .hero-blob-3 { animation: none; }
   .dot-current { animation: none; }
+}
+
+/* ── Mobile performance: disable heavy blob animations ──── */
+@media (max-width: 767px) {
+  .hero-blob-1, .hero-blob-2, .hero-blob-3 { animation: none; }
 }
