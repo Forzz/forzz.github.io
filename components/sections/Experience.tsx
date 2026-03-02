@@ -20,16 +20,24 @@ interface ExperienceItemShape {
   bullets?: { ru: readonly string[]; en: readonly string[] };
 }
 
-export default function Experience() {
-  const t = useT();
-  const { locale } = useSite();
-  const timelineRef = useRef<HTMLDivElement>(null);
-
+function TimelineFill({ timelineRef }: { timelineRef: React.RefObject<HTMLDivElement | null> }) {
   const { scrollYProgress } = useScroll({
     target: timelineRef,
     offset: ["start 80%", "end 70%"],
   });
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  return (
+    <motion.div
+      className="absolute left-0 top-0 w-px bg-indigo-500/65 dark:bg-indigo-400/60 origin-top hidden md:block"
+      style={{ height: lineHeight }}
+    />
+  );
+}
+
+export default function Experience() {
+  const t = useT();
+  const { locale } = useSite();
+  const timelineRef = useRef<HTMLDivElement>(null);
 
   // Helper: renders a plain string or a {ru,en} object
   const tx = (val: string | I18n): string =>
@@ -54,11 +62,8 @@ export default function Experience() {
         <div ref={timelineRef} className="relative ml-3">
           {/* Track line */}
           <div className="absolute left-0 top-0 bottom-0 w-px bg-gray-200 dark:bg-gray-800" />
-          {/* Animated fill line — slightly brighter to draw the eye upward */}
-          <motion.div
-            className="absolute left-0 top-0 w-px bg-indigo-500/65 dark:bg-indigo-400/60 origin-top"
-            style={{ height: lineHeight }}
-          />
+          {/* Animated fill line — desktop only */}
+          <TimelineFill timelineRef={timelineRef} />
 
           {experience.items.map((item, i) => {
             const it = item as ExperienceItemShape;
@@ -131,10 +136,10 @@ export default function Experience() {
             return (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, x: -18 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08, ease: "easeOut" }}
+                transition={{ duration: 0.4, delay: i * 0.06, ease: "easeOut" }}
                 className={`relative pl-8 ${bottomPad} ${topPad} ${itemOpacity}`}
               >
                 {/* Dot */}

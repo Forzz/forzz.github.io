@@ -95,7 +95,7 @@ export default function Navbar() {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       scrolled || menuOpen
-        ? "bg-white/90 dark:bg-gray-950/95 backdrop-blur-md shadow-[0_1px_16px_rgba(0,0,0,0.07)] dark:shadow-[0_1px_16px_rgba(0,0,0,0.35)]"
+        ? "bg-white/97 dark:bg-gray-950/98 md:bg-white/90 md:dark:bg-gray-950/95 md:backdrop-blur-md shadow-[0_1px_16px_rgba(0,0,0,0.07)] dark:shadow-[0_1px_16px_rgba(0,0,0,0.35)]"
         : ""
     }`}>
       <nav className="max-w-5xl mx-auto px-6 flex items-center justify-between py-4">

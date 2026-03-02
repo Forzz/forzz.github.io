@@ -66,8 +66,8 @@ export default function Hero() {
       onMouseMove={handleMouseMove}
       className="relative min-h-screen flex items-center justify-center px-6"
     >
-      {/* Animated background blobs */}
-      <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden">
+      {/* Animated background blobs — hidden on mobile (expensive GPU compositing on iOS Safari) */}
+      <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden hidden md:block">
         <motion.div
           style={{ x: blob1X, y: blob1Y }}
           className="hero-blob-1 absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-indigo-500/10 dark:bg-indigo-500/8 blur-2xl md:blur-3xl"
