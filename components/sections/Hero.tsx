@@ -66,18 +66,7 @@ export default function Hero() {
       onMouseMove={handleMouseMove}
       className="relative min-h-screen flex items-center justify-center px-6"
     >
-      {/* Animated background blobs — hidden on mobile (expensive GPU compositing on iOS Safari) */}
-      <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden hidden md:block">
-        <motion.div
-          style={{ x: blob1X, y: blob1Y }}
-          className="hero-blob-1 absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-indigo-500/10 dark:bg-indigo-500/8 blur-2xl md:blur-3xl"
-        />
-        <motion.div
-          style={{ x: blob2X, y: blob2Y }}
-          className="hero-blob-2 absolute -bottom-40 -right-40 w-[420px] h-[420px] rounded-full bg-violet-500/8 dark:bg-violet-500/6 blur-2xl md:blur-3xl"
-        />
-        <div className="hero-blob-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-indigo-400/5 dark:bg-indigo-400/4 blur-2xl md:blur-3xl" />
-      </div>
+      {/* Фоновые блобы теперь в PageBackground (fixed, на всю страницу) */}
 
       <div className="max-w-5xl w-full grid md:grid-cols-2 gap-16 items-center">
 

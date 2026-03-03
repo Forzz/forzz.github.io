@@ -90,9 +90,16 @@ export default function Navbar() {
       }),
     );
 
-    // Переключаем тему когда оверлей закрыл экран
-    setTimeout(toggleTheme, 340);
-    setTimeout(() => overlay.remove(), 390);
+    // Когда оверлей закрыл экран — применяем тему напрямую,
+    // потом ждём два кадра (браузер успевает отрисовать) и убираем оверлей
+    setTimeout(() => {
+      document.documentElement.classList.toggle("dark", next === "dark");
+      localStorage.setItem("theme", next);
+      toggleTheme();
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => overlay.remove())
+      );
+    }, 350);
   };
 
   return (
