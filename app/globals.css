@@ -40,13 +40,6 @@ body {
 }
 .dot-current { animation: pulse-dot 2.4s ease-out infinite; }
 
-/* ── Theme toggle: View Transitions circle wipe ─────────── */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
 /* ── Reduced motion ─────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

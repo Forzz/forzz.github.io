@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { flushSync } from "react-dom";
 import { useSite, useT } from "@/context/SiteContext";
 import config from "@/portfolio.config";
 
@@ -75,21 +74,25 @@ export default function Navbar() {
       Math.max(y, window.innerHeight - y),
     );
 
-    if (!document.startViewTransition) {
-      toggleTheme();
-      return;
-    }
+    const next = theme === "dark" ? "light" : "dark";
+    // bg-white (#fff) или bg-gray-950 (#030712)
+    const newBg = next === "dark" ? "#030712" : "#ffffff";
 
-    const transition = document.startViewTransition(() => {
-      flushSync(toggleTheme);
-    });
+    // Оверлей цвета новой темы растёт из точки клика, накрывает экран,
+    // тема переключается под ним, затем оверлей убирается — без артефактов
+    const overlay = document.createElement("div");
+    overlay.style.cssText = `position:fixed;inset:0;z-index:9999;background:${newBg};clip-path:circle(0px at ${x}px ${y}px);pointer-events:none;transition:clip-path 350ms ease-out;`;
+    document.body.appendChild(overlay);
 
-    transition.ready.then(() => {
-      document.documentElement.animate(
-        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
-        { duration: 380, easing: "ease-out", pseudoElement: "::view-transition-new(root)" },
-      );
-    }).catch(() => {});
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        overlay.style.clipPath = `circle(${r}px at ${x}px ${y}px)`;
+      }),
+    );
+
+    // Переключаем тему когда оверлей закрыл экран
+    setTimeout(toggleTheme, 340);
+    setTimeout(() => overlay.remove(), 390);
   };
 
   return (
