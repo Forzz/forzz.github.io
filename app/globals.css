@@ -13,6 +13,21 @@ body {
   max-width: 100%;
 }
 
+/* View Transitions for theme switch: no default cross-fade, only custom reveal */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+}
+
 /* ── Hero: floating blobs ──────────────────────────────── */
 @keyframes blob1 {
   0%, 100% { transform: translate(0, 0) scale(1); }

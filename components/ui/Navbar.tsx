@@ -1,10 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { flushSync } from "react-dom";
 import { useSite, useT } from "@/context/SiteContext";
 import config from "@/portfolio.config";
 
 const { nav, personal, ui } = config;
+
+type ViewTransition = {
+  ready: Promise<void>;
+};
+
+type DocumentWithViewTransition = Document & {
+  startViewTransition?: (update: () => void) => ViewTransition;
+};
 
 function SunIcon() {
   return (
@@ -67,39 +76,49 @@ export default function Navbar() {
   const closeMenu = () => setMenuOpen(false);
 
   const handleThemeToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const lowCpu = (navigator.hardwareConcurrency ?? 8) <= 4;
+    const lowMemory = ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) <= 4;
+    const doc = document as DocumentWithViewTransition;
+
+    if (reduceMotion || lowCpu || lowMemory || !doc.startViewTransition) {
+      toggleTheme();
+      return;
+    }
+
     const x = e.clientX;
     const y = e.clientY;
-    const r = Math.hypot(
+    const radius = Math.hypot(
       Math.max(x, window.innerWidth - x),
       Math.max(y, window.innerHeight - y),
     );
 
-    const next = theme === "dark" ? "light" : "dark";
-    // bg-white (#fff) или bg-gray-950 (#030712)
-    const newBg = next === "dark" ? "#030712" : "#ffffff";
+    const root = document.documentElement;
+    const transition = doc.startViewTransition(() => {
+      flushSync(() => {
+        toggleTheme();
+      });
+    });
 
-    // Оверлей цвета новой темы растёт из точки клика, накрывает экран,
-    // тема переключается под ним, затем оверлей убирается — без артефактов
-    const overlay = document.createElement("div");
-    overlay.style.cssText = `position:fixed;inset:0;z-index:9999;background:${newBg};clip-path:circle(0px at ${x}px ${y}px);pointer-events:none;transition:clip-path 350ms ease-out;`;
-    document.body.appendChild(overlay);
-
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        overlay.style.clipPath = `circle(${r}px at ${x}px ${y}px)`;
-      }),
-    );
-
-    // Когда оверлей закрыл экран — применяем тему напрямую,
-    // потом ждём два кадра (браузер успевает отрисовать) и убираем оверлей
-    setTimeout(() => {
-      document.documentElement.classList.toggle("dark", next === "dark");
-      localStorage.setItem("theme", next);
-      toggleTheme();
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() => overlay.remove())
-      );
-    }, 350);
+    transition.ready
+      .then(() => {
+        root.animate(
+          {
+            clipPath: [
+              `circle(0px at ${x}px ${y}px)`,
+              `circle(${radius}px at ${x}px ${y}px)`,
+            ],
+          },
+          {
+            duration: 420,
+            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+            pseudoElement: "::view-transition-new(root)",
+          } as KeyframeAnimationOptions,
+        );
+      })
+      .catch(() => {
+        // Fallback: если transition сорвался, тема уже переключена.
+      });
   };
 
   return (
